@@ -34,7 +34,7 @@ jobs:
               -e YB_PASSWORD=${{vars.YUGABYTE_PASSWORD}} \
               yugabytedb/yugabyte:latest bin/yugabyted start \
               --base_dir=/home/yugabyte/yb_data \
-              --background=false
+              --background=false --ysql_enable_auth=true
 
 
 
