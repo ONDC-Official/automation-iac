@@ -21,8 +21,7 @@ jobs:
 
       - name: Deploy yugabyte db 
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} bash -c "            
-            
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} bash -c "
             # Deploy yugabyte container with the ACL file
             sudo docker stop yugabyte-db || true && sudo docker rm yugabyte-db || true &&
             docker run -d --name yugabyte-db \
@@ -32,7 +31,4 @@ jobs:
               yugabytedb/yugabyte:latest bin/yugabyted start \
               --base_dir=/home/yugabyte/yb_data \
               --background=false --ysql_enable_auth=true
-
-
-
           "
