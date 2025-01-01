@@ -21,13 +21,10 @@ jobs:
 
       - name: Deploy yugabyte db 
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} bash -c "
-            if sudo docker inspect -f '{{.State.Running}}' yugabyte-db &>/dev/null; then
-              sudo docker stop yugabyte-db && sudo docker rm yugabyte-db
-            fi
-            
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} bash -c "            
             
             # Deploy yugabyte container with the ACL file
+            sudo docker stop yugabyte-db || true && sudo docker rm yugabyte-db || true &&
             docker run -d --name yugabyte-db \
               -p7000:7000 -p9000:9000 -p15433:15433 -p5433:5433 -p9042:9042 \
               -v ~/yb_data:/home/yugabyte/yb_data \
