@@ -1,9 +1,10 @@
-name: ONDC Automation Mock Service Deployment
+name: Postgres Deploy
 
 on:
-  push:
-    branches: ["master"]
-
+  # push:
+    # branches: ["master"]
+  workflow_dispatch:
+  
 jobs:
   ssh-ec2:
     runs-on: ubuntu-latest
