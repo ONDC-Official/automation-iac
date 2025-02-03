@@ -28,7 +28,7 @@ jobs:
             sudo docker stop yugabyte-db-staging || true && sudo docker rm yugabyte-db-staging || true &&
             docker run -d --name yugabyte-db-staging \
               -p7001:7000 -p9001:9000 -p15434:15433 -p5434:5433 -p9043:9042 \
-              -v ~/yb_data:/home/shreyansh/yb_data \
+              -v ~/yb_data_staging:/home/shreyansh/yb_data \
               -e YB_PASSWORD=${{vars.YUGABYTE_PASSWORD}} \
               yugabytedb/yugabyte:latest bin/yugabyted start \
               --base_dir=/home/yugabyte/yb_data \
