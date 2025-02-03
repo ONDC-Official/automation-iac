@@ -32,7 +32,7 @@ jobs:
             # Deploy Redis container with the ACL file
             sudo docker run -d \
               --name redis-cache-staging \
-              -p ${vars.REDIS-PORT}:6379 \
+              -p ${vars.REDIS_PORT_STAGING}:6379 \
               -v /tmp/redis-users.acl:/usr/local/etc/redis-users.acl \
               redis:latest \
               redis-server --aclfile /usr/local/etc/redis-users.acl
