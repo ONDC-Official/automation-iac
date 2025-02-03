@@ -1,0 +1,36 @@
+name: YUGABYTE_DEPLOYMENT
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add Host to Known Hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy yugabyte db 
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }}  << 'EOF'
+            # Deploy yugabyte container with the ACL file
+            docker pull yugabytedb/yugabyte:latest     
+            
+            sudo docker stop yugabyte-db-staging || true && sudo docker rm yugabyte-db-staging || true &&
+            docker run -d --name yugabyte-db-staging \
+              -p7001:7000 -p9001:9000 -p15434:15433 -p5434:5433 -p9043:9042 \
+              -v ~/yb_data:/home/shreyansh/yb_data \
+              -e YB_PASSWORD=${{vars.YUGABYTE_PASSWORD}} \
+              yugabytedb/yugabyte:latest bin/yugabyted start \
+              --base_dir=/home/yugabyte/yb_data \
+              --background=false --ysql_enable_auth=true
+          EOF
