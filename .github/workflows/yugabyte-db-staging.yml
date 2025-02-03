@@ -1,4 +1,4 @@
-name: YUGABYTE_DEPLOYMENT
+name: YUGABYTE_DEPLOYMENT_STAGING
 
 on:
   workflow_dispatch:
