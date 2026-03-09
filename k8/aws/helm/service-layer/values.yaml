@@ -206,7 +206,7 @@ reportService:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-report-service
-    tag: dev-1.0.1
+    tag: dev-1.0.4
   service:
     type: ClusterIP
     port: 3000
@@ -232,7 +232,7 @@ uiBackend:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-ui-backend
-    tag: dev-1.0.1
+    tag: dev-1.0.4
   service:
     type: ClusterIP
     port: 5000
@@ -266,7 +266,7 @@ uiFrontend:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-ui-frontend
-    tag: dev-1.0.1
+    tag: dev-1.0.4
   service:
     type: ClusterIP
     port: 5001
