@@ -206,7 +206,7 @@ reportService:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-report-service
-    tag: dev-1.0.1
+    tag: dev-1.0.7
   service:
     type: ClusterIP
     port: 3000
