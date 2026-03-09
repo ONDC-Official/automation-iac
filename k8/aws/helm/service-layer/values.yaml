@@ -1,0 +1,302 @@
+global:
+  namespace: automation-dev
+  createNamespace: true
+  environment: dev
+  replicas: 1
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 300m
+      memory: 700Mi
+
+commonEnv:
+  nodeEnv: dev
+  otelUrl: "http://otel-collector.gcr-dev.svc.cluster.local:4318"
+  lokiHost: "http://loki.gcr-dev.svc.cluster.local:3100"
+  lokiPushUrl: "http://loki.gcr-dev.svc.cluster.local:3100/loki/api/v1/push"
+  redisHost: "redis"
+  redisPort: "6379"
+  redisUsername: ""
+  redisPassword: ""
+  sessionSecret: ""
+  databaseHost: ""
+  databasePort: "5432"
+  databaseName: ""
+  databaseUsername: ""
+  databasePassword: ""
+  databaseUrl: "http://db-service:5001"
+  databaseDsn: "mongodb://mongo:27017/registry"
+  databaseApiKey: ""
+  mongoUri: ""
+  apiServiceUrl: "http://api-service:3000"
+  apiServiceIngressUrl: "https://REPLACE_ME/api-service"
+  apiServiceKey: "dev-api-key"
+  configServiceUrl: "http://config-service:5556"
+  reportingServiceUrl: "http://report-service:3000/"
+  validationUrl: "https://log-validation.ondc.org/api/validate"
+  mockServiceUrl: "http://mock-service:3031"
+  uiBackendUrl: "http://ui-backend:5000"
+  uiBackendIngressUrl: "https://REPLACE_ME/backend-ui"
+  formServiceBaseUrl: "https://REPLACE_ME/form-service"
+  frontendUrl: "https://REPLACE_ME"
+  backofficeBackendIngressUrl: "https://REPLACE_ME/backoffice-api"
+  backofficeBasePath: "/backoffice"
+  bapUrl: "https://REPLACE_ME/buyer"
+  bppUrl: "https://REPLACE_ME/seller"
+  pramaanUrl: "http://report-pramaan-buyer:3005"
+
+backofficeBackend:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-backoffice-backend
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 5000
+  env:
+    DB_KEY: '{{ .Values.commonEnv.databaseApiKey }}'
+    DB_SERVICE: '{{ .Values.commonEnv.databaseUrl }}'
+    MOCK_SERVICE: '{{ .Values.commonEnv.mockServiceUrl }}'
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+    PORT: '{{ .Values.backofficeBackend.service.port }}'
+    REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_PORT: '{{ .Values.commonEnv.redisPort }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'
+    SERVICE_NAME: 'backoffice-backend'
+    SESSION_SECRET: '{{ .Values.commonEnv.sessionSecret }}'
+    TRACE_URL: '{{ .Values.commonEnv.otelUrl }}'
+
+backofficeFrontend:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-backoffice-frontend
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 5001
+  env:
+    VITE_BACKEND_URL: '{{ .Values.commonEnv.backofficeBackendIngressUrl }}'
+    VITE_BASE_URL: '{{ .Values.commonEnv.backofficeBasePath }}'
+
+configService:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-config-service
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 5556
+  env:
+    PORT: '{{ .Values.configService.service.port }}'
+    REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_PORT: '{{ .Values.commonEnv.redisPort }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'
+    SERVICE_NAME: 'config-service'
+    TRACE_URL: '{{ .Values.commonEnv.otelUrl }}'
+
+configServiceTest:
+  enabled: false
+  image:
+    repository: ghcr.io/ondc-official/workbench-config-service-test
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 5556
+  env:
+    PORT: '{{ .Values.configServiceTest.service.port }}'
+    REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_PORT: '{{ .Values.commonEnv.redisPort }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'
+    SERVICE_NAME: 'config-service-test'
+    TRACE_URL: '{{ .Values.commonEnv.otelUrl }}'
+
+dbService:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-db-service
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 5001
+  env:
+    API_SERVICE_KEY: '{{ .Values.commonEnv.apiServiceKey }}'
+    DB_HOST: '{{ .Values.commonEnv.databaseHost }}'
+    DB_NAME: '{{ .Values.commonEnv.databaseName }}'
+    DB_PASSWORD: '{{ .Values.commonEnv.databasePassword }}'
+    DB_PORT: '{{ .Values.commonEnv.databasePort }}'
+    DB_USERNAME: '{{ .Values.commonEnv.databaseUsername }}'
+    MONGO_URI: '{{ .Values.commonEnv.mongoUri }}'
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+    PORT: '{{ .Values.dbService.service.port }}'
+    SERVICE_NAME: 'db-service'
+    TRACE_URL: '{{ .Values.commonEnv.otelUrl }}'
+
+reportPramaanBuyer:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-report-pramaan-buyer
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 3005
+  env:
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+
+reportPramaanSeller:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-report-pramaan-seller
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 3005
+  env:
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+
+recorderService:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-recorder-service
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 8089
+    grpcPort: 8090
+  env:
+    RECORDER_API_TTL_SECONDS_DEFAULT: '300'
+    RECORDER_ASYNC_DROP_ON_FULL: 'false'
+    RECORDER_ASYNC_QUEUE_SIZE: '1000'
+    RECORDER_ASYNC_WORKERS: '4'
+    RECORDER_CACHE_TTL_SECONDS_DEFAULT: '300'
+    RECORDER_DB_API_KEY: '{{ .Values.commonEnv.databaseApiKey }}'
+    RECORDER_DB_BASE_URL: '{{ .Values.commonEnv.databaseUrl }}'
+    RECORDER_DB_ENABLED_ENVS: ''
+    RECORDER_DB_TIMEOUT_MS: '5000'
+    RECORDER_ENV: '{{ .Values.global.environment }}'
+    RECORDER_LISTEN_ADDR: '{{ printf ":%v" .Values.recorderService.service.port }}'
+    RECORDER_NO_BEARER_TOKEN: ''
+    RECORDER_NO_ENABLED_ENVS: ''
+    RECORDER_NO_TIMEOUT_MS: '10000'
+    RECORDER_NO_URL: ''
+    RECORDER_SKIP_CACHE_UPDATE: 'false'
+    RECORDER_SKIP_DB_SAVE: 'false'
+    RECORDER_SKIP_NO_PUSH: 'false'
+    REDIS_ADDR: '{{- if .Values.commonEnv.redisHost }}{{ printf "%s:%s" .Values.commonEnv.redisHost .Values.commonEnv.redisPort }}{{- end }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'
+
+registryService:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-registry-service
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    DB_DSN: '{{ .Values.commonEnv.databaseDsn }}'
+
+reportService:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-report-service
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    API_SERVICE_KEY: '{{ .Values.commonEnv.apiServiceKey }}'
+    AUTOMATION_BACKEND: '{{ .Values.commonEnv.uiBackendUrl }}'
+    DATA_BASE_URL: '{{ .Values.commonEnv.databaseUrl }}'
+    LOKI_HOST: '{{ .Values.commonEnv.lokiHost }}'
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+    PORT: '{{ .Values.reportService.service.port }}'
+    PRAMAAN_ENVIRONMENT: '{{ .Values.global.environment }}'
+    PRAMAAN_URL: '{{ .Values.commonEnv.pramaanUrl }}'
+    REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_PORT: '{{ .Values.commonEnv.redisPort }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'
+    SERVICE_NAME: 'report-service'
+    TRACE_URL: '{{ .Values.commonEnv.otelUrl }}'
+    UTILITY: ''
+    VALIDATION_URL: '{{ .Values.commonEnv.validationUrl }}'
+
+uiBackend:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-ui-backend
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 5000
+  env:
+    ADMIN_PASSWORD: ''
+    ADMIN_USERNAME: ''
+    API_SERVICE: '{{ .Values.commonEnv.apiServiceUrl }}'
+    API_SERVICE_KEY: '{{ .Values.commonEnv.apiServiceKey }}'
+    BACKEND_URL: '{{ .Values.commonEnv.uiBackendIngressUrl }}'
+    CONFIG_SERVICE: '{{ .Values.commonEnv.configServiceUrl }}'
+    DB_SERVICE: '{{ .Values.commonEnv.databaseUrl }}'
+    DB_SERVICE_API_KEY: '{{ .Values.commonEnv.databaseApiKey }}'
+    FRONTEND_URL: '{{ .Values.commonEnv.frontendUrl }}'
+    GITHUB_CLIENT_ID: ''
+    GITHUB_CLIENT_SECRET: ''
+    IN_HOUSE_REGISTRY: ''
+    LOKI_HOST: '{{ .Values.commonEnv.lokiHost }}'
+    MOCK_SERVICE: '{{ .Values.commonEnv.mockServiceUrl }}'
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+    PORT: '{{ .Values.uiBackend.service.port }}'
+    REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_PORT: '{{ .Values.commonEnv.redisPort }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'
+    REPORTING_SERVICE: '{{ .Values.commonEnv.reportingServiceUrl }}'
+    SERVICE_NAME: 'ui-backend'
+    SESSION_SECRET: '{{ .Values.commonEnv.sessionSecret }}'
+    TRACE_URL: '{{ .Values.commonEnv.otelUrl }}'
+
+uiFrontend:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-ui-frontend
+    tag: dev-1.0.1
+  service:
+    type: ClusterIP
+    port: 5001
+  env:
+    VITE_BAP_URL: '{{ .Values.commonEnv.bapUrl }}'
+    VITE_BACKEND_URL: '{{ .Values.commonEnv.uiBackendIngressUrl }}'
+    VITE_BASE_URL: '{{ .Values.commonEnv.apiServiceIngressUrl }}'
+    VITE_BPP_URL: '{{ .Values.commonEnv.bppUrl }}'
+    VITE_DB_SERVICE_API_KEY: '{{ .Values.commonEnv.databaseApiKey }}'
+
+formService:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/workbench-form-service
+    tag: dev-1.0.1
+  command:
+    - npm
+    - run
+    - start
+  service:
+    type: ClusterIP
+    port: 3300
+  env:
+    BACKEND_URL: '{{ .Values.commonEnv.uiBackendIngressUrl }}'
+    BASE_URL: '{{ .Values.commonEnv.formServiceBaseUrl }}'
+    LOKI_HOST: '{{ .Values.commonEnv.lokiHost }}'
+    MOCK_SERVICE_URL: '{{ .Values.commonEnv.mockServiceUrl }}'
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+    PORT: '{{ .Values.formService.service.port }}'
+    REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_PORT: '{{ .Values.commonEnv.redisPort }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'

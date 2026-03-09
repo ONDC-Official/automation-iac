@@ -1,0 +1,3 @@
+{{- if .Values.recorderService.enabled }}
+{{ include "automation-service-layer.renderService" (dict "root" $ "service" .Values.recorderService "name" "recorder-service" "component" "backend") }}
+{{- end }}

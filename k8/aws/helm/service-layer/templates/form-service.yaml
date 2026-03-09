@@ -1,0 +1,3 @@
+{{- if .Values.formService.enabled }}
+{{ include "automation-service-layer.renderService" (dict "root" $ "service" .Values.formService "name" "form-service" "component" "backend") }}
+{{- end }}

@@ -1,0 +1,57 @@
+global:
+  namespace: automation-dev
+  createNamespace: false
+
+redis:
+  enabled: true
+  name: redis
+  replicaCount: 1
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+  service:
+    port: 6379
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+    storageClassName: "gp2"
+  extraArgs:
+    - --save
+    - ""
+    - --appendonly
+    - "no"
+
+mongo:
+  enabled: true
+  name: mongo
+  replicaCount: 1
+  image:
+    repository: mongo
+    tag: "6"
+    pullPolicy: IfNotPresent
+  service:
+    port: 27017
+  database: registry
+  resources:
+    requests:
+      cpu: 25m
+      memory: 96Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
+    storageClassName: "gp2"

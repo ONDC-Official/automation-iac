@@ -1,0 +1,3 @@
+{{- if .Values.uiFrontend.enabled }}
+{{ include "automation-service-layer.renderService" (dict "root" $ "service" .Values.uiFrontend "name" "ui-frontend" "component" "frontend") }}
+{{- end }}

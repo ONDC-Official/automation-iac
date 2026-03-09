@@ -1,0 +1,10 @@
+global:
+  namespace: automation-preprod
+  createNamespace: false
+  environment: preprod
+
+commonEnv:
+  nodeEnv: preprod
+  otelUrl: "http://otel-collector.gcr-preprod.svc.cluster.local:4318"
+  lokiHost: "http://loki.gcr-preprod.svc.cluster.local:3100"
+  lokiPushUrl: "http://loki.gcr-preprod.svc.cluster.local:3100/loki/api/v1/push"

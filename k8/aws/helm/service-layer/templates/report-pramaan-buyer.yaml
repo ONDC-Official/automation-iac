@@ -1,0 +1,3 @@
+{{- if .Values.reportPramaanBuyer.enabled }}
+{{ include "automation-service-layer.renderService" (dict "root" $ "service" .Values.reportPramaanBuyer "name" "report-pramaan-buyer" "component" "backend") }}
+{{- end }}

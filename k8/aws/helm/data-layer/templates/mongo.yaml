@@ -1,0 +1,91 @@
+{{- if .Values.mongo.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: {{ .Values.mongo.name }}
+    {{- include "automation-data-layer.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: {{ .Values.mongo.name }}
+  ports:
+    - name: mongo
+      port: {{ .Values.mongo.service.port }}
+      targetPort: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-headless" .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: {{ .Values.mongo.name }}
+    {{- include "automation-data-layer.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: {{ .Values.mongo.name }}
+  ports:
+    - name: mongo
+      port: {{ .Values.mongo.service.port }}
+      targetPort: mongo
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: {{ .Values.mongo.name }}
+    {{- include "automation-data-layer.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ printf "%s-headless" .Values.mongo.name }}
+  replicas: {{ .Values.mongo.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.mongo.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mongo.name }}
+        component: data
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: mongo
+          image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
+          imagePullPolicy: {{ .Values.mongo.image.pullPolicy }}
+          ports:
+            - name: mongo
+              containerPort: {{ .Values.mongo.service.port }}
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: {{ .Values.mongo.database | quote }}
+          resources:
+{{ toYaml .Values.mongo.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+      {{- if not .Values.mongo.persistence.enabled }}
+      volumes:
+        - name: data
+          emptyDir: {}
+      {{- end }}
+  {{- if .Values.mongo.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+{{ toYaml .Values.mongo.persistence.accessModes | nindent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.mongo.persistence.size }}
+        {{- if .Values.mongo.persistence.storageClassName }}
+        storageClassName: {{ .Values.mongo.persistence.storageClassName | quote }}
+        {{- end }}
+  {{- end }}
+{{- end }}

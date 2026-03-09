@@ -1,0 +1,3 @@
+{{- if .Values.backofficeBackend.enabled }}
+{{ include "automation-service-layer.renderService" (dict "root" $ "service" .Values.backofficeBackend "name" "backoffice-backend" "component" "backend") }}
+{{- end }}

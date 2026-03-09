@@ -1,0 +1,3 @@
+{{- if .Values.configService.enabled }}
+{{ include "automation-service-layer.renderService" (dict "root" $ "service" .Values.configService "name" "config-service" "component" "backend") }}
+{{- end }}
