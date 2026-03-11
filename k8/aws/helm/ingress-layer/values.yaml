@@ -1,0 +1,42 @@
+global:
+  namespace: automation-dev
+  environment: dev
+
+ingress:
+  enabled: true
+  name: automation-ingress
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/group.name: "gcr-dev-shared-alb"
+    alb.ingress.kubernetes.io/group.order: "20"
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/transforms.backoffice-frontend: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/backoffice\\/?(.*)$","replace":"/$1"}]}}]'
+    alb.ingress.kubernetes.io/transforms.ui-backend: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/backend-ui\\/?(.*)$","replace":"/$1"}]}}]'
+    alb.ingress.kubernetes.io/transforms.form-service: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/form-service\\/?(.*)$","replace":"/$1"}]}}]'
+    alb.ingress.kubernetes.io/transforms.backoffice-backend: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/backoffice-api\\/?(.*)$","replace":"/$1"}]}}]'
+  hosts:
+    - host: dev-automation.ondc.org
+      paths:
+        - path: /
+          pathType: Prefix
+          service: ui-frontend
+          port: 5001
+        - path: /backoffice
+          pathType: Prefix
+          service: backoffice-frontend
+          port: 5001
+        - path: /backend-ui
+          pathType: Prefix
+          service: ui-backend
+          port: 5000
+        - path: /form-service
+          pathType: Prefix
+          service: form-service
+          port: 3300
+        - path: /backoffice-api
+          pathType: Prefix
+          service: backoffice-backend
+          port: 5000

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: automation-ingress-layer
+description: Shared ALB ingress routing for automation services
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - automation
+  - ingress
+  - alb
+  - shared-alb
+maintainers:
+  - name: Platform Team
+    email: platform@example.com

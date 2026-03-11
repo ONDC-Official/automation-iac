@@ -1,0 +1,39 @@
+global:
+  namespace: automation-preprod
+  environment: preprod
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/group.name: "gcr-preprod-shared-alb"
+    alb.ingress.kubernetes.io/group.order: "20"
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/transforms.backoffice-frontend:
+    alb.ingress.kubernetes.io/transforms.ui-backend:
+    alb.ingress.kubernetes.io/transforms.form-service:
+    alb.ingress.kubernetes.io/transforms.backoffice-backend:
+  hosts:
+    - host: automation-preprod.ondc.org
+      paths:
+        - path: /
+          pathType: Prefix
+          service: ui-frontend
+          port: 5001
+        - path: /backoffice
+          pathType: Prefix
+          service: backoffice-frontend
+          port: 5001
+        - path: /backend-ui
+          pathType: Prefix
+          service: ui-backend
+          port: 5000
+        - path: /form-service
+          pathType: Prefix
+          service: form-service
+          port: 3300
+        - path: /backoffice-api
+          pathType: Prefix
+          service: backoffice-backend
+          port: 5000
