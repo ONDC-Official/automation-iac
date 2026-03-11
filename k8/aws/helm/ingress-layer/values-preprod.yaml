@@ -37,3 +37,16 @@ ingress:
           pathType: Prefix
           service: backoffice-backend
           port: 5000
+
+domainRouting:
+  enabled: true
+  api:
+    path: /api-service
+    pathType: Prefix
+    service: api-router
+    port: 8080
+  mock:
+    path: /mock
+    pathType: Prefix
+    service: mock-router
+    port: 8080

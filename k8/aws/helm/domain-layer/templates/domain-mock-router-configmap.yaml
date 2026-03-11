@@ -1,0 +1,78 @@
+{{- if .Values.mockRouter.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mock-router-nginx-config
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: mock-router
+    {{- include "automation-domain-layer.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+    worker_processes auto;
+    events {
+      worker_connections 1024;
+    }
+    http {
+      server_tokens off;
+      keepalive_timeout 65;
+
+      server {
+        listen {{ .Values.mockRouter.service.port }};
+        client_max_body_size 20m;
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+
+        location = /healthz {
+          access_log off;
+          return 200 "ok\n";
+        }
+{{ range .Values.domains }}
+{{ if and (default true .enabled) .domain .version .mock (default true .mock.enabled) }}
+{{ $key := include "automation-domain-layer.domainKey" (dict "domain" .domain "version" .version) }}
+{{ $mode := default "service" .mock.mode }}
+{{ $domainRegex := .domain | replace "." "\\." }}
+{{ $versionRegex := .version | replace "." "\\." }}
+{{ if eq $mode "playground" }}
+{{ $playgroundBase := default $.Values.mockRouter.defaultPlaygroundUrl .mock.playgroundUrl }}
+{{ $normalizedPlaygroundBase := printf "%s/" (trimSuffix "/" $playgroundBase) }}
+
+        location ~* ^/mock/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {
+          proxy_http_version 1.1;
+          proxy_ssl_server_name on;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_pass {{ $normalizedPlaygroundBase }}$1;
+        }
+{{ else }}
+{{ $routeService := dig "route" "upstreamService" "" .mock }}
+{{ $routePort := dig "route" "upstreamPort" nil .mock }}
+{{ $routeScheme := dig "route" "upstreamScheme" "" .mock }}
+{{ $routeBasePath := dig "route" "upstreamBasePath" "" .mock }}
+{{ $serviceName := default (printf "domain-%s-mock" $key) $routeService }}
+{{ $servicePort := default (default 3031 (dig "service" "port" nil .mock)) $routePort }}
+{{ $scheme := default "http" $routeScheme }}
+{{ $mockBasePath := default (printf "/mock/%s/" .domain) $routeBasePath }}
+{{ $normalizedMockBasePath := printf "%s/" (trimSuffix "/" $mockBasePath) }}
+
+        location ~* ^/mock/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {
+          proxy_http_version 1.1;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_pass {{ $scheme }}://{{ $serviceName }}:{{ $servicePort }}{{ $normalizedMockBasePath }}$1;
+        }
+{{ end }}
+{{ end }}
+{{ end }}
+
+        location / {
+          return 404 "mock route not configured\n";
+        }
+      }
+    }
+{{- end }}

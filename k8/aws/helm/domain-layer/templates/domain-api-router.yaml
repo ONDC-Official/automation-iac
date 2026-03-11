@@ -1,0 +1,70 @@
+{{- if .Values.apiRouter.enabled }}
+{{- $resources := default .Values.global.resources .Values.apiRouter.resources }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-router
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: api-router
+    {{- include "automation-domain-layer.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.apiRouter.service.type }}
+  selector:
+    app: api-router
+  ports:
+    - name: http
+      port: {{ .Values.apiRouter.service.port }}
+      targetPort: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-router
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: api-router
+    {{- include "automation-domain-layer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.apiRouter.replicas | default .Values.global.replicas }}
+  selector:
+    matchLabels:
+      app: api-router
+  template:
+    metadata:
+      labels:
+        app: api-router
+        component: router
+    spec:
+      containers:
+        - name: api-router
+          image: {{ .Values.apiRouter.image.repository }}:{{ .Values.apiRouter.image.tag }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.apiRouter.service.port }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+{{ toYaml $resources | nindent 12 }}
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: api-router-nginx-config
+{{- end }}

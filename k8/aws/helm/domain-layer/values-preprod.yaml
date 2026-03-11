@@ -1,0 +1,17 @@
+global:
+  namespace: automation-preprod
+  createNamespace: false
+  environment: preprod
+
+commonEnv:
+  api: {}
+  mock: {}
+
+apiRouter:
+  enabled: true
+
+mockRouter:
+  enabled: true
+  defaultPlaygroundUrl: "https://workbench.ondc.tech/mock/playground/"
+
+domains: []

@@ -1,0 +1,105 @@
+global:
+  namespace: automation-dev
+  createNamespace: false
+  environment: dev
+  replicas: 1
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 300m
+      memory: 700Mi
+
+commonEnv:
+  api: {}
+  mock: {}
+# Example:
+# commonEnv:
+#   api:
+#     NODE_ENV: production
+#     SUBSCRIBER_ID: dev-automation.ondc.org
+#     REDIS_HOST: redis
+#     REDIS_PORT: "6379"
+#     WORKBENCH_SUBSCRIBER_ID: mock.workbench.ondc
+#     IN_HOUSE_REGISTRY: https://dev-automation.ondc.org/registry/v2.0/
+#     MOCK_SERVER_URL: https://dev-automation.ondc.org/mock
+#     DATA_BASE_URL: https://dev-automation.ondc.org/db-service
+#     API_SERVICE_URL: https://dev-automation.ondc.org/api-service
+#     CONFIG_SERVICE_URL: https://dev-automation.ondc.org/config-service
+#     TRACE_URL: http://otel-collector.gcr-dev.svc.cluster.local:4318/v1/traces
+#     HOSTED_ENV: DEV
+#   mock:
+#     NODE_ENV: production
+#     SUBSCRIBER_ID: mock.workbench.ondc
+#     REDIS_HOST: redis
+#     REDIS_PORT: "6379"
+#     TRACE_URL: http://otel-collector.gcr-dev.svc.cluster.local:4318/v1/traces
+
+apiRouter:
+  enabled: true
+  image:
+    repository: nginx
+    tag: "1.27-alpine"
+  service:
+    type: ClusterIP
+    port: 8080
+  replicas: 1
+  resources: {}
+
+mockRouter:
+  enabled: true
+  image:
+    repository: nginx
+    tag: "1.27-alpine"
+  service:
+    type: ClusterIP
+    port: 8080
+  replicas: 1
+  resources: {}
+  defaultPlaygroundUrl: "https://workbench.ondc.tech/mock/playground/"
+
+domains: []
+# Example:
+# - domain: "ONDC:FIS13"
+#   version: "2.0.0"
+#   enabled: true
+#   replicas: 1
+#   api:
+#     enabled: true
+#     image:
+#       repository: ghcr.io/ondc-official/workbench-api-fis13
+#       tag: dev-1.0.1
+#     service:
+#       type: ClusterIP
+#       port: 3000
+#     env:
+#       API_MODE: "domain"
+#   mock:
+#     enabled: true
+#     mode: service
+#     image:
+#       repository: ghcr.io/ondc-official/workbench-mock-fis13
+#       tag: dev-1.0.1
+#     service:
+#       type: ClusterIP
+#       port: 3031
+#     env:
+#       MOCK_MODE: "domain"
+#
+# - domain: "ONDC:RETINVL"
+#   version: "1.2.5"
+#   enabled: true
+#   api:
+#     enabled: true
+#     image:
+#       repository: ghcr.io/ondc-official/workbench-api-retinvl
+#       tag: dev-1.0.1
+#     service:
+#       type: ClusterIP
+#       port: 3000
+#   mock:
+#     enabled: true
+#     mode: playground
+#     playgroundUrl: "https://workbench.ondc.tech/mock/playground/"

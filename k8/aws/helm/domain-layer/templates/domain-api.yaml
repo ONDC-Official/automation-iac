@@ -1,0 +1,78 @@
+{{- range .Values.domains }}
+{{- if and (default true .enabled) .domain .version .api (default true .api.enabled) }}
+{{- $key := include "automation-domain-layer.domainKey" (dict "domain" .domain "version" .version) }}
+{{- $name := default (printf "domain-%s-api" $key) .api.serviceName }}
+{{- $serviceType := default "ClusterIP" (dig "service" "type" "" .api) }}
+{{- $port := default 3000 (dig "service" "port" nil .api) }}
+{{- $resources := default $.Values.global.resources .api.resources }}
+{{- $replicas := default (default $.Values.global.replicas .replicas) .api.replicas }}
+{{- $commonEnv := default dict $.Values.commonEnv.api }}
+{{- $apiEnv := default dict .api.env }}
+{{- $fixedEnv := dict "DOMAIN" .domain "VERSION" .version "DOMAIN_VERSION" .version }}
+{{- $mergedEnv := mergeOverwrite (dict) $commonEnv $apiEnv $fixedEnv }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.global.namespace | default $.Release.Namespace }}
+  labels:
+    app: {{ $name }}
+    component: api
+    domain: {{ .domain | quote }}
+    domainVersion: {{ .version | quote }}
+    {{- include "automation-domain-layer.labels" $ | nindent 4 }}
+spec:
+  type: {{ $serviceType }}
+  selector:
+    app: {{ $name }}
+  ports:
+    - name: http
+      port: {{ $port }}
+      targetPort: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.global.namespace | default $.Release.Namespace }}
+  labels:
+    app: {{ $name }}
+    component: api
+    domain: {{ .domain | quote }}
+    domainVersion: {{ .version | quote }}
+    {{- include "automation-domain-layer.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ $replicas }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+        component: api
+        domain: {{ .domain | quote }}
+        domainVersion: {{ .version | quote }}
+    spec:
+      containers:
+        - name: api
+          image: {{ required (printf "domains[%s].api.image.repository is required" $key) .api.image.repository }}:{{ required (printf "domains[%s].api.image.tag is required" $key) .api.image.tag }}
+          imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
+          {{- with .api.command }}
+          command:
+{{ toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ $port }}
+          env:
+            {{- range $envName, $envValue := $mergedEnv }}
+            - name: {{ $envName }}
+              value: {{ tpl (toString $envValue) $ | quote }}
+            {{- end }}
+          resources:
+{{ toYaml $resources | nindent 12 }}
+{{- end }}
+{{- end }}

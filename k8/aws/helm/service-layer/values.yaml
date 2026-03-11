@@ -86,7 +86,7 @@ configService:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-config-service
-    tag: dev-1.0.4
+    tag: dev-1.0.1
   service:
     type: ClusterIP
     port: 5556
@@ -206,7 +206,7 @@ reportService:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-report-service
-    tag: dev-1.0.9
+    tag: dev-1.0.1
   service:
     type: ClusterIP
     port: 3000

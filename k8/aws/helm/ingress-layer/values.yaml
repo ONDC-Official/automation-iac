@@ -18,7 +18,7 @@ ingress:
     alb.ingress.kubernetes.io/transforms.form-service: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/form-service\\/?(.*)$","replace":"/$1"}]}}]'
     alb.ingress.kubernetes.io/transforms.backoffice-backend: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/backoffice-api\\/?(.*)$","replace":"/$1"}]}}]'
   hosts:
-    - host: dev-automation.ondc.org
+    - host: dev-workbench.ondc.tech
       paths:
         - path: /
           pathType: Prefix
@@ -40,3 +40,16 @@ ingress:
           pathType: Prefix
           service: backoffice-backend
           port: 5000
+
+domainRouting:
+  enabled: true
+  api:
+    path: /api-service
+    pathType: Prefix
+    service: api-router
+    port: 8080
+  mock:
+    path: /mock
+    pathType: Prefix
+    service: mock-router
+    port: 8080

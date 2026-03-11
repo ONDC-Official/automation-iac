@@ -1,0 +1,63 @@
+{{- if .Values.apiRouter.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-router-nginx-config
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: api-router
+    {{- include "automation-domain-layer.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+    worker_processes auto;
+    events {
+      worker_connections 1024;
+    }
+    http {
+      server_tokens off;
+      keepalive_timeout 65;
+
+      server {
+        listen {{ .Values.apiRouter.service.port }};
+        client_max_body_size 20m;
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+
+        location = /healthz {
+          access_log off;
+          return 200 "ok\n";
+        }
+{{ range .Values.domains }}
+{{ if and (default true .enabled) .domain .version .api (default true .api.enabled) }}
+{{ $key := include "automation-domain-layer.domainKey" (dict "domain" .domain "version" .version) }}
+{{ $routeService := dig "route" "upstreamService" "" .api }}
+{{ $routePort := dig "route" "upstreamPort" nil .api }}
+{{ $routeScheme := dig "route" "upstreamScheme" "" .api }}
+{{ $routeBasePath := dig "route" "upstreamBasePath" "" .api }}
+{{ $serviceName := default (printf "domain-%s-api" $key) $routeService }}
+{{ $servicePort := default (default 3000 (dig "service" "port" nil .api)) $routePort }}
+{{ $scheme := default "http" $routeScheme }}
+{{ $basePath := default (printf "/api-service/%s/%s/" .domain .version) $routeBasePath }}
+{{ $normalizedBasePath := printf "%s/" (trimSuffix "/" $basePath) }}
+{{ $domainRegex := .domain | replace "." "\\." }}
+{{ $versionRegex := .version | replace "." "\\." }}
+
+        location ~* ^/api-service/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {
+          proxy_http_version 1.1;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_pass {{ $scheme }}://{{ $serviceName }}:{{ $servicePort }}{{ $normalizedBasePath }}$1;
+        }
+{{ end }}
+{{ end }}
+
+        location / {
+          return 404 "api route not configured\n";
+        }
+      }
+    }
+{{- end }}
