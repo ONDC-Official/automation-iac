@@ -163,7 +163,7 @@ recorderService:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-recorder-service
-    tag: dev-1.0.1
+    tag: dev-0.0.1
   service:
     type: ClusterIP
     port: 8089
