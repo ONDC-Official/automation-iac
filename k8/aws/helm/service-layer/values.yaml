@@ -195,7 +195,7 @@ registryService:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-registry-service
-    tag: dev-1.0.1
+    tag: dev-1.0.2
   service:
     type: ClusterIP
     port: 8080
