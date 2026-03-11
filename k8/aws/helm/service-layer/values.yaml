@@ -52,7 +52,7 @@ backofficeBackend:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-backoffice-backend
-    tag: dev-1.0.1
+    tag: dev-1.0.3
   service:
     type: ClusterIP
     port: 5000
@@ -74,7 +74,7 @@ backofficeFrontend:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-backoffice-frontend
-    tag: dev-1.0.1
+    tag: dev-1.0.3
   service:
     type: ClusterIP
     port: 5001
