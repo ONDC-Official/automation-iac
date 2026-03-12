@@ -51,7 +51,7 @@ commonEnv:
 backofficeBackend:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-backoffice-backend
+    repository: ghcr.io/ondc-official/automation-backoffice-backend
     tag: dev-1.0.3
   service:
     type: ClusterIP
@@ -73,7 +73,7 @@ backofficeBackend:
 backofficeFrontend:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-backoffice-frontend
+    repository: ghcr.io/ondc-official/automation-backoffice-frontend
     tag: dev-1.0.3
   service:
     type: ClusterIP
@@ -85,7 +85,7 @@ backofficeFrontend:
 configService:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-config-service
+    repository: ghcr.io/ondc-official/automation-config-service
     tag: dev-1.0.4
   service:
     type: ClusterIP
@@ -119,7 +119,7 @@ configServiceTest:
 dbService:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-db-service
+    repository: ghcr.io/ondc-official/automation-db
     tag: dev-1.0.2
   service:
     type: ClusterIP
@@ -162,7 +162,7 @@ reportPramaanSeller:
 recorderService:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-recorder-service
+    repository: ghcr.io/ondc-official/automation-recorder-service
     tag: dev-0.0.1
   service:
     type: ClusterIP
@@ -194,7 +194,7 @@ recorderService:
 registryService:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-registry-service
+    repository: ghcr.io/ondc-official/automation-registry
     tag: dev-1.0.2
   service:
     type: ClusterIP
@@ -205,7 +205,7 @@ registryService:
 reportService:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-report-service
+    repository: ghcr.io/ondc-official/automation-report-service
     tag: dev-1.0.9
   service:
     type: ClusterIP
@@ -231,7 +231,7 @@ reportService:
 uiBackend:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-ui-backend
+    repository: ghcr.io/ondc-official/automation-frontend/backend
     tag: dev-1.0.3
   service:
     type: ClusterIP
@@ -265,7 +265,7 @@ uiBackend:
 uiFrontend:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-ui-frontend
+    repository: ghcr.io/ondc-official/automation-frontend/frontend
     tag: dev-1.0.3
   service:
     type: ClusterIP
@@ -280,7 +280,7 @@ uiFrontend:
 formService:
   enabled: true
   image:
-    repository: ghcr.io/ondc-official/workbench-form-service
+    repository: ghcr.io/ondc-official/automation-form-service
     tag: dev-1.0.3
   command:
     - npm
