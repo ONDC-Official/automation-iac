@@ -281,7 +281,7 @@ formService:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-form-service
-    tag: dev-1.0.1
+    tag: dev-1.0.3
   command:
     - npm
     - run
