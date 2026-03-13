@@ -12,6 +12,6 @@ apiRouter:
 
 mockRouter:
   enabled: true
-  defaultPlaygroundUrl: "https://workbench.ondc.tech/mock/playground/"
+  defaultPlaygroundUrl: "http://playground-mock-service:3000/mock/playground/"
 
 domains: []

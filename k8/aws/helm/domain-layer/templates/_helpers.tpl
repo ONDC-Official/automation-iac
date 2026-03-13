@@ -63,3 +63,41 @@ Build a stable key from domain + version.
 {{- $version := include "automation-domain-layer.domainSlug" .version -}}
 {{- printf "%s-v%s" $domain $version -}}
 {{- end -}}
+
+{{/*
+Normalize arbitrary values for use in Kubernetes labels.
+*/}}
+{{- define "automation-domain-layer.labelValue" -}}
+{{- $value := toString . -}}
+{{- $normalized := regexReplaceAll "[^A-Za-z0-9._-]+" $value "-" -}}
+{{- $normalized = regexReplaceAll "^[^A-Za-z0-9]+" $normalized "" -}}
+{{- $normalized = regexReplaceAll "[^A-Za-z0-9]+$" $normalized "" -}}
+{{- if not $normalized -}}
+{{- $normalized = "na" -}}
+{{- end -}}
+{{- $normalized | trunc 63 | trimSuffix "-" | trimSuffix "." | trimSuffix "_" -}}
+{{- end -}}
+
+{{/*
+Validate and normalize supported mock modes.
+*/}}
+{{- define "automation-domain-layer.mockMode" -}}
+{{- $mode := default "service" . -}}
+{{- if not (has $mode (list "service" "playground")) -}}
+{{- fail (printf "mock.mode must be either \"service\" or \"playground\", got %q" $mode) -}}
+{{- end -}}
+{{- $mode -}}
+{{- end -}}
+
+{{/*
+Resolve the shared playground upstream URL for a mock domain.
+*/}}
+{{- define "automation-domain-layer.playgroundUrl" -}}
+{{- $root := index . "root" -}}
+{{- $domain := index . "domain" -}}
+{{- $playgroundUrl := coalesce (dig "mock" "playgroundUrl" "" $domain) $root.Values.mockRouter.defaultPlaygroundUrl -}}
+{{- if not $playgroundUrl -}}
+{{- fail (printf "domains[%s].mock.mode=playground requires mock.playgroundUrl or mockRouter.defaultPlaygroundUrl" (include "automation-domain-layer.domainKey" (dict "domain" $domain.domain "version" $domain.version))) -}}
+{{- end -}}
+{{- printf "%s/" (trimSuffix "/" $playgroundUrl) -}}
+{{- end -}}

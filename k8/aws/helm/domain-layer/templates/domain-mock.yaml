@@ -1,6 +1,6 @@
 {{- range .Values.domains }}
 {{- if and (default true .enabled) .domain .version .mock (default true .mock.enabled) }}
-{{- $mode := default "service" .mock.mode }}
+{{- $mode := include "automation-domain-layer.mockMode" .mock.mode }}
 {{- if ne $mode "playground" }}
 {{- $key := include "automation-domain-layer.domainKey" (dict "domain" .domain "version" .version) }}
 {{- $name := default (printf "domain-%s-mock" $key) .mock.serviceName }}
@@ -12,6 +12,8 @@
 {{- $mockEnv := default dict .mock.env }}
 {{- $fixedEnv := dict "DOMAIN" .domain "VERSION" .version "DOMAIN_VERSION" .version }}
 {{- $mergedEnv := mergeOverwrite (dict) $commonEnv $mockEnv $fixedEnv }}
+{{- $domainLabel := include "automation-domain-layer.labelValue" .domain }}
+{{- $versionLabel := include "automation-domain-layer.labelValue" .version }}
 ---
 apiVersion: v1
 kind: Service
@@ -21,8 +23,8 @@ metadata:
   labels:
     app: {{ $name }}
     component: mock
-    domain: {{ .domain | quote }}
-    domainVersion: {{ .version | quote }}
+    domain: {{ $domainLabel | quote }}
+    domainVersion: {{ $versionLabel | quote }}
     {{- include "automation-domain-layer.labels" $ | nindent 4 }}
 spec:
   type: {{ $serviceType }}
@@ -42,8 +44,8 @@ metadata:
   labels:
     app: {{ $name }}
     component: mock
-    domain: {{ .domain | quote }}
-    domainVersion: {{ .version | quote }}
+    domain: {{ $domainLabel | quote }}
+    domainVersion: {{ $versionLabel | quote }}
     {{- include "automation-domain-layer.labels" $ | nindent 4 }}
 spec:
   replicas: {{ $replicas }}
@@ -55,8 +57,8 @@ spec:
       labels:
         app: {{ $name }}
         component: mock
-        domain: {{ .domain | quote }}
-        domainVersion: {{ .version | quote }}
+        domain: {{ $domainLabel | quote }}
+        domainVersion: {{ $versionLabel | quote }}
     spec:
       containers:
         - name: mock

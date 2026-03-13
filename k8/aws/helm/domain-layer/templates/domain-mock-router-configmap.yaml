@@ -32,12 +32,11 @@ data:
 {{ range .Values.domains }}
 {{ if and (default true .enabled) .domain .version .mock (default true .mock.enabled) }}
 {{ $key := include "automation-domain-layer.domainKey" (dict "domain" .domain "version" .version) }}
-{{ $mode := default "service" .mock.mode }}
+{{ $mode := include "automation-domain-layer.mockMode" .mock.mode }}
 {{ $domainRegex := .domain | replace "." "\\." }}
 {{ $versionRegex := .version | replace "." "\\." }}
 {{ if eq $mode "playground" }}
-{{ $playgroundBase := default $.Values.mockRouter.defaultPlaygroundUrl .mock.playgroundUrl }}
-{{ $normalizedPlaygroundBase := printf "%s/" (trimSuffix "/" $playgroundBase) }}
+{{ $normalizedPlaygroundBase := include "automation-domain-layer.playgroundUrl" (dict "root" $ "domain" .) }}
 
         location ~* ^/mock/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {
           proxy_http_version 1.1;

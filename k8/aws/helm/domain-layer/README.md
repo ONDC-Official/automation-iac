@@ -13,15 +13,15 @@ This chart manages domain-specific API/mock workloads and the shared domain rout
 ## Deploy
 
 ```bash
-helm upgrade --install automation-domain ./automation-infra/domain-layer \
-  -f ./automation-infra/domain-layer/values.yaml \
+helm upgrade --install automation-domain k8/aws/helm/domain-layer \
+  -f k8/aws/helm/domain-layer/values.yaml \
   --namespace automation-dev
 ```
 
 ```bash
-helm upgrade --install automation-domain ./automation-infra/domain-layer \
-  -f ./automation-infra/domain-layer/values.yaml \
-  -f ./automation-infra/domain-layer/values-preprod.yaml \
+helm upgrade --install automation-domain k8/aws/helm/domain-layer \
+  -f k8/aws/helm/domain-layer/values.yaml \
+  -f k8/aws/helm/domain-layer/values-preprod.yaml \
   --namespace automation-preprod
 ```
 
@@ -29,4 +29,7 @@ helm upgrade --install automation-domain ./automation-infra/domain-layer \
 
 - Domain and version are injected into each workload as `DOMAIN` and `DOMAIN_VERSION`.
 - Mock routes support `mode: service` and `mode: playground`.
+- `mock.mode: playground` reuses `mockRouter.defaultPlaygroundUrl` unless a domain sets `mock.playgroundUrl`; the default now points at the shared in-cluster `playground-mock-service`.
+- Playground domains create only router entries; dedicated mock Deployments/Services are rendered only for `mock.mode: service`.
+- Every enabled domain with `mock.enabled != false` generates its own `/mock/<domain>/<version>/...` route automatically.
 - Env merge order is: `commonEnv.<type>` -> `domains[].<type>.env` -> fixed keys (`DOMAIN`, `VERSION`, `DOMAIN_VERSION`).

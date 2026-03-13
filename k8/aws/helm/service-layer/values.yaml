@@ -1,6 +1,6 @@
 global:
   namespace: automation-dev
-  createNamespace: true
+  createNamespace: false
   environment: dev
   replicas: 1
   imagePullPolicy: IfNotPresent
@@ -37,7 +37,7 @@ commonEnv:
   configServiceUrl: "http://config-service:5556"
   reportingServiceUrl: "http://report-service:3000/"
   validationUrl: "https://log-validation.ondc.org/api/validate"
-  mockServiceUrl: "http://mock-service:3031"
+  playgroundMockServiceUrl: "http://playground-mock-service:3000"
   uiBackendUrl: "http://ui-backend:5000"
   uiBackendIngressUrl: "https://REPLACE_ME/backend-ui"
   formServiceBaseUrl: "https://REPLACE_ME/form-service"
@@ -59,7 +59,7 @@ backofficeBackend:
   env:
     DB_KEY: '{{ .Values.commonEnv.databaseApiKey }}'
     DB_SERVICE: '{{ .Values.commonEnv.databaseUrl }}'
-    MOCK_SERVICE: '{{ .Values.commonEnv.mockServiceUrl }}'
+    MOCK_SERVICE: '{{ .Values.commonEnv.playgroundMockServiceUrl }}'
     NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
     PORT: '{{ .Values.backofficeBackend.service.port }}'
     REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
@@ -136,6 +136,31 @@ dbService:
     PORT: '{{ .Values.dbService.service.port }}'
     SERVICE_NAME: 'db-service'
     TRACE_URL: '{{ .Values.commonEnv.otelUrl }}'
+
+playgroundMockService:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/automation-mock-playground-service
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    API_SERVICE_URL: 'https://dev-workbench.ondc.tech/api-service'
+    BASE_URL: 'https://dev-workbench.ondc.tech/mock/playground'
+    CONFIG_SERVICE_URL: 'https://dev-workbench.ondc.tech/config-service'
+    LOG_LEVEL: 'debug'
+    LOKI_HOST: 'http://13.233.69.163:3002'
+    NODE_ENV: 'production'
+    PORT: '{{ .Values.playgroundMockService.service.port }}'
+    RABBITMQ_URL: ''
+    REDIS_DB_0: ''
+    REDIS_DB_1: ''
+    REDIS_HOST: '13.233.69.163'
+    REDIS_PASSWORD: 'automation_password_ondc'
+    REDIS_PORT: '6379'
+    REDIS_USERNAME: 'automation_ondc'
+    SERVICE_NAME: 'ondc-playground-mock'
 
 reportPramaanBuyer:
   enabled: true
@@ -250,7 +275,7 @@ uiBackend:
     GITHUB_CLIENT_SECRET: ''
     IN_HOUSE_REGISTRY: ''
     LOKI_HOST: '{{ .Values.commonEnv.lokiHost }}'
-    MOCK_SERVICE: '{{ .Values.commonEnv.mockServiceUrl }}'
+    MOCK_SERVICE: '{{ .Values.commonEnv.playgroundMockServiceUrl }}'
     NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
     PORT: '{{ .Values.uiBackend.service.port }}'
     REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
@@ -293,7 +318,7 @@ formService:
     BACKEND_URL: '{{ .Values.commonEnv.uiBackendIngressUrl }}'
     BASE_URL: '{{ .Values.commonEnv.formServiceBaseUrl }}'
     LOKI_HOST: '{{ .Values.commonEnv.lokiHost }}'
-    MOCK_SERVICE_URL: '{{ .Values.commonEnv.mockServiceUrl }}'
+    MOCK_SERVICE_URL: '{{ .Values.commonEnv.playgroundMockServiceUrl }}'
     NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
     PORT: '{{ .Values.formService.service.port }}'
     REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'

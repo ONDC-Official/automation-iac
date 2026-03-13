@@ -5,7 +5,8 @@ This chart is a boilerplate service layer for the deployable core services copie
 ## What is included
 
 - Generic Service + Deployment rendering for the core workbench services
-- Optional namespace bootstrap inside this chart
+- Shared `playground-mock-service` workload for the central playground mock endpoint
+- Optional namespace bootstrap inside this chart, disabled by default for shared namespaces
 - Shared `commonEnv` values for envs reused across services
 - Per-service env maps for service-specific settings
 
@@ -20,4 +21,5 @@ This chart is a boilerplate service layer for the deployable core services copie
 
 - Repeated env values are centralized in `commonEnv`.
 - Internal service-to-service URLs are prefilled with the renamed in-cluster service names.
+- `commonEnv.playgroundMockServiceUrl` resolves to the in-cluster `playground-mock-service` and is reused by UI, backoffice, form-service, and shared playground routing.
 - Service-specific env keys stay inside each service block.

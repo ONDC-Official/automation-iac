@@ -58,48 +58,47 @@ mockRouter:
     port: 8080
   replicas: 1
   resources: {}
-  defaultPlaygroundUrl: "https://workbench.ondc.tech/mock/playground/"
+  # Shared playground upstream reused by any domain with mock.mode=playground.
+  defaultPlaygroundUrl: "http://playground-mock-service:3000/mock/playground/"
 
-domains: []
-# Example:
-# - domain: "ONDC:FIS13"
-#   version: "2.0.0"
-#   enabled: true
-#   replicas: 1
-#   api:
-#     enabled: true
-#     image:
-#       repository: ghcr.io/ondc-official/workbench-api-fis13
-#       tag: dev-1.0.1
-#     service:
-#       type: ClusterIP
-#       port: 3000
-#     env:
-#       API_MODE: "domain"
-#   mock:
-#     enabled: true
-#     mode: service
-#     image:
-#       repository: ghcr.io/ondc-official/workbench-mock-fis13
-#       tag: dev-1.0.1
-#     service:
-#       type: ClusterIP
-#       port: 3031
-#     env:
-#       MOCK_MODE: "domain"
-#
-# - domain: "ONDC:RETINVL"
-#   version: "1.2.5"
-#   enabled: true
-#   api:
-#     enabled: true
-#     image:
-#       repository: ghcr.io/ondc-official/workbench-api-retinvl
-#       tag: dev-1.0.1
-#     service:
-#       type: ClusterIP
-#       port: 3000
-#   mock:
-#     enabled: true
-#     mode: playground
-#     playgroundUrl: "https://workbench.ondc.tech/mock/playground/"
+domains:
+  - domain: "ONDC:FIS12"
+    version: "2.3.0"
+    enabled: true
+    api:
+      enabled: true
+      image:
+        repository: ghcr.io/ondc-official/ondc-onix-dev-ondcfis12-2.3.0
+        tag: dev-13d15
+      service:
+        type: ClusterIP
+        port: 7039
+      env:
+        API_SERVICE_KEY: "D33A76D111B4BDFCB96A2AC34B85E"
+        API_SERVICE_URL: "https://dev-workbench.ondc.tech/api-service"
+        CONFIG_SERVICE_URL: "https://dev-workbench.ondc.tech/config-service"
+        CONTAINER_NAME: "dev-ondcfis12-2.3.0"
+        DATA_BASE_URL: "https://dev-workbench.ondc.tech/db-service"
+        HOSTED_ENV: "DEV"
+        IN_HOUSE_REGISTRY: "https://dev-workbench.ondc.tech/registry/v2.0/"
+        LOKI_HOST: "http://13.233.69.163:3002"
+        MOCK_SERVER_URL: "https://dev-workbench.ondc.tech/mock"
+        NODE_ENV: "production"
+        NO_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkYXRhb3JjQHNlbGxlciIsImV4cCI6MTgyMjkwMDAwMCwiZnJlc2giOmZhbHNlLCJpYXQiOjE2NTkxNTE5NTYsImp0aSI6Ijc3ZGRjMTdmNTkwMDQ0YWFhY2UzYTZiNjFmN2U1ZmI0IiwibmJmIjoxNjU5MTUxOTU2LCJ0eXBlIjoiYWNjZXNzIiwiZW1haWwiOiJ0ZWNoQG9uZGMub3JnIiwicHVycG9zZSI6ImRhdGFzaGFyaW5nIiwicGhvbmVfbnVtYmVyIjpudWxsLCJyb2xlcyI6WyJhZG1pbmlzdHJhdG9yIl0sImZpcnN0X25hbWUiOiJuZXR3b3JrIiwibGFzdF9uYW1lIjoib2JzZXJ2YWJpbGl0eSJ9.FXcJY78_swFd0VWPs-A7SfuLPaTuqGO3rhUv8ooNaV0"
+        NO_URL: "https://analytics-api-staging.aws.ondc.org/"
+        ONDC_ENV: ""
+        PORT: "7039"
+        REDIS_HOST: "13.233.69.163"
+        REDIS_PASSWORD: "automation_password_ondc"
+        REDIS_PORT: "6379"
+        REDIS_USERNAME: "automation_ondc"
+        SERVICE_NAME: "automation-api-service-dev-ondcfis12-2.3.0"
+        SIGN_PRIVATE_KEY: "TNQyLktBlHNYIecRgfgNaR+F2JgdAP1xTDng2vuOWL0YMB5ZoixsNDtExgDkBHOkoizQ5WN9qzs9NQaa1Vr6yg=="
+        SIGN_PUBLIC_KEY: "GDAeWaIsbDQ7RMYA5ARzpKIs0OVjfas7PTUGmtVa+so="
+        SUBSCRIBER_ID: "dev-workbench.ondc.tech"
+        TRACE_URL: "http://172.17.0.1:4318/v1/traces"
+        UKID: "27baa06d-d91a-486c-85e5-cc621b787f04"
+        WORKBENCH_SUBSCRIBER_ID: "mock.workbench.ondc"
+    mock:
+      enabled: true
+      mode: playground

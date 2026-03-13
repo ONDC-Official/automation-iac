@@ -10,6 +10,8 @@
 {{- $apiEnv := default dict .api.env }}
 {{- $fixedEnv := dict "DOMAIN" .domain "VERSION" .version "DOMAIN_VERSION" .version }}
 {{- $mergedEnv := mergeOverwrite (dict) $commonEnv $apiEnv $fixedEnv }}
+{{- $domainLabel := include "automation-domain-layer.labelValue" .domain }}
+{{- $versionLabel := include "automation-domain-layer.labelValue" .version }}
 ---
 apiVersion: v1
 kind: Service
@@ -19,8 +21,8 @@ metadata:
   labels:
     app: {{ $name }}
     component: api
-    domain: {{ .domain | quote }}
-    domainVersion: {{ .version | quote }}
+    domain: {{ $domainLabel | quote }}
+    domainVersion: {{ $versionLabel | quote }}
     {{- include "automation-domain-layer.labels" $ | nindent 4 }}
 spec:
   type: {{ $serviceType }}
@@ -40,8 +42,8 @@ metadata:
   labels:
     app: {{ $name }}
     component: api
-    domain: {{ .domain | quote }}
-    domainVersion: {{ .version | quote }}
+    domain: {{ $domainLabel | quote }}
+    domainVersion: {{ $versionLabel | quote }}
     {{- include "automation-domain-layer.labels" $ | nindent 4 }}
 spec:
   replicas: {{ $replicas }}
@@ -53,8 +55,8 @@ spec:
       labels:
         app: {{ $name }}
         component: api
-        domain: {{ .domain | quote }}
-        domainVersion: {{ .version | quote }}
+        domain: {{ $domainLabel | quote }}
+        domainVersion: {{ $versionLabel | quote }}
     spec:
       containers:
         - name: api
