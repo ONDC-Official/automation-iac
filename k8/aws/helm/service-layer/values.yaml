@@ -32,20 +32,20 @@ commonEnv:
   databaseApiKey: ""
   mongoUri: "mongodb://mongo:27017/registry"
   apiServiceUrl: "http://api-service:3000"
-  apiServiceIngressUrl: "https://REPLACE_ME/api-service"
+  apiServiceIngressUrl: "http://dev-workbench.ondc.tech/api-service"
   apiServiceKey: "dev-api-key"
   configServiceUrl: "http://config-service:5556"
   reportingServiceUrl: "http://report-service:3000/"
   validationUrl: "https://log-validation.ondc.org/api/validate"
   playgroundMockServiceUrl: "http://playground-mock-service:3000"
-  uiBackendUrl: "http://ui-backend:5000"
-  uiBackendIngressUrl: "https://REPLACE_ME/backend-ui"
-  formServiceBaseUrl: "https://REPLACE_ME/form-service"
-  frontendUrl: "https://REPLACE_ME"
-  backofficeBackendIngressUrl: "https://REPLACE_ME/backoffice-api"
+  uiBackendUrl: "http://dev-workbench.ondc.tech/backend-ui"
+  uiBackendIngressUrl: "http://dev-workbench.ondc.tech/backend-ui"
+  formServiceBaseUrl: "http://dev-workbench.ondc.tech/form-service"
+  frontendUrl: "http://dev-workbench.ondc.tech"
+  backofficeBackendIngressUrl: "http://dev-workbench.ondc.tech/backoffice-api"
   backofficeBasePath: "/backoffice"
-  bapUrl: "https://REPLACE_ME/buyer"
-  bppUrl: "https://REPLACE_ME/seller"
+  bapUrl: "http://dev-workbench.ondc.tech/buyer"
+  bppUrl: "http://dev-workbench.ondc.tech/seller"
   pramaanUrl: "http://report-pramaan-buyer:3005"
 
 backofficeBackend:
@@ -291,7 +291,7 @@ uiFrontend:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/workbench-ui-frontend
-    tag: dev-1.0.1
+    tag: k8-1.1
   service:
     type: ClusterIP
     port: 5001
