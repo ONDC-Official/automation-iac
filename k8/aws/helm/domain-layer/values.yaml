@@ -13,8 +13,16 @@ global:
       memory: 700Mi
 
 commonEnv:
-  api: {}
-  mock: {}
+  api:
+    REDIS_HOST: "redis"
+    REDIS_PASSWORD: ""
+    REDIS_PORT: "6379"
+    REDIS_USERNAME: ""
+  mock:
+    REDIS_HOST: "redis"
+    REDIS_PASSWORD: ""
+    REDIS_PORT: "6379"
+    REDIS_USERNAME: ""
 # Example:
 # commonEnv:
 #   api:
@@ -88,10 +96,6 @@ domains:
         NO_URL: "https://analytics-api-staging.aws.ondc.org/"
         ONDC_ENV: ""
         PORT: "7039"
-        REDIS_HOST: "13.233.69.163"
-        REDIS_PASSWORD: "automation_password_ondc"
-        REDIS_PORT: "6379"
-        REDIS_USERNAME: "automation_ondc"
         SERVICE_NAME: "automation-api-service-dev-ondcfis12-2.3.0"
         SIGN_PRIVATE_KEY: "TNQyLktBlHNYIecRgfgNaR+F2JgdAP1xTDng2vuOWL0YMB5ZoixsNDtExgDkBHOkoizQ5WN9qzs9NQaa1Vr6yg=="
         SIGN_PUBLIC_KEY: "GDAeWaIsbDQ7RMYA5ARzpKIs0OVjfas7PTUGmtVa+so="

@@ -22,15 +22,15 @@ commonEnv:
   redisUsername: ""
   redisPassword: ""
   sessionSecret: ""
-  databaseHost: ""
-  databasePort: "5432"
-  databaseName: ""
+  databaseHost: "mongo"
+  databasePort: "27017"
+  databaseName: "registry"
   databaseUsername: ""
   databasePassword: ""
   databaseUrl: "http://db-service:5001"
   databaseDsn: "mongodb://mongo:27017/registry"
   databaseApiKey: ""
-  mongoUri: ""
+  mongoUri: "mongodb://mongo:27017/registry"
   apiServiceUrl: "http://api-service:3000"
   apiServiceIngressUrl: "https://REPLACE_ME/api-service"
   apiServiceKey: "dev-api-key"
@@ -156,10 +156,10 @@ playgroundMockService:
     RABBITMQ_URL: ''
     REDIS_DB_0: ''
     REDIS_DB_1: ''
-    REDIS_HOST: '13.233.69.163'
-    REDIS_PASSWORD: 'automation_password_ondc'
-    REDIS_PORT: '6379'
-    REDIS_USERNAME: 'automation_ondc'
+    REDIS_HOST: '{{ .Values.commonEnv.redisHost }}'
+    REDIS_PASSWORD: '{{ .Values.commonEnv.redisPassword }}'
+    REDIS_PORT: '{{ .Values.commonEnv.redisPort }}'
+    REDIS_USERNAME: '{{ .Values.commonEnv.redisUsername }}'
     SERVICE_NAME: 'ondc-playground-mock'
 
 reportPramaanBuyer:
