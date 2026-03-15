@@ -14,6 +14,8 @@ ingress:
     alb.ingress.kubernetes.io/transforms.ui-backend:
     alb.ingress.kubernetes.io/transforms.form-service:
     alb.ingress.kubernetes.io/transforms.backoffice-backend:
+    alb.ingress.kubernetes.io/transforms.db-service:
+    alb.ingress.kubernetes.io/transforms.config-service:
   hosts:
     - host: automation-preprod.ondc.org
       paths:
