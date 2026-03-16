@@ -50,7 +50,8 @@ data:
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_pass {{ $scheme }}://{{ $serviceName }}:{{ $servicePort }}{{ $normalizedBasePath }}$1;
+          rewrite ^/api-service/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {{ $normalizedBasePath }}$1 break;
+          proxy_pass {{ $scheme }}://{{ $serviceName }}:{{ $servicePort }};
         }
 {{ end }}
 {{ end }}

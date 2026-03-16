@@ -37,7 +37,7 @@ commonEnv:
   configServiceUrl: "http://config-service:5556"
   reportingServiceUrl: "http://report-service:3000/"
   validationUrl: "https://log-validation.ondc.org/api/validate"
-  playgroundMockServiceUrl: "http://playground-mock-service:3000"
+  playgroundMockServiceUrl: "http://dev-workbench.ondc.tech/mock"
   uiBackendUrl: "http://dev-workbench.ondc.tech/backend-ui"
   uiBackendIngressUrl: "http://dev-workbench.ondc.tech/backend-ui"
   formServiceBaseUrl: "http://dev-workbench.ondc.tech/form-service"
@@ -146,9 +146,9 @@ playgroundMockService:
     type: ClusterIP
     port: 3000
   env:
-    API_SERVICE_URL: 'https://dev-workbench.ondc.tech/api-service'
-    BASE_URL: 'https://dev-workbench.ondc.tech/mock/playground'
-    CONFIG_SERVICE_URL: 'https://dev-workbench.ondc.tech/config-service'
+    API_SERVICE_URL: 'http://dev-workbench.ondc.tech/api-service'
+    BASE_URL: 'http://dev-workbench.ondc.tech/mock/playground'
+    CONFIG_SERVICE_URL: 'http://dev-workbench.ondc.tech/config-service'
     LOG_LEVEL: 'debug'
     LOKI_HOST: 'http://13.233.69.163:3002'
     NODE_ENV: 'production'

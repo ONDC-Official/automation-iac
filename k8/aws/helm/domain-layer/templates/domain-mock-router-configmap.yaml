@@ -37,6 +37,11 @@ data:
 {{ $versionRegex := .version | replace "." "\\." }}
 {{ if eq $mode "playground" }}
 {{ $normalizedPlaygroundBase := include "automation-domain-layer.playgroundUrl" (dict "root" $ "domain" .) }}
+{{ if not (regexMatch "^[A-Za-z][A-Za-z0-9+.-]*://[^/]+/.*$" $normalizedPlaygroundBase) }}
+{{ fail (printf "domains[%s].mock.playgroundUrl must be a full URL with scheme, host, and path" $key) }}
+{{ end }}
+{{ $playgroundUpstream := regexReplaceAll "^([A-Za-z][A-Za-z0-9+.-]*)://([^/]+)(/.*)$" $normalizedPlaygroundBase "${1}://${2}" }}
+{{ $playgroundBasePath := regexReplaceAll "^([A-Za-z][A-Za-z0-9+.-]*)://([^/]+)(/.*)$" $normalizedPlaygroundBase "${3}" }}
 
         location ~* ^/mock/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {
           proxy_http_version 1.1;
@@ -44,7 +49,8 @@ data:
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_pass {{ $normalizedPlaygroundBase }}$1;
+          rewrite ^/mock/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {{ $playgroundBasePath }}$1 break;
+          proxy_pass {{ $playgroundUpstream }};
         }
 {{ else }}
 {{ $routeService := dig "route" "upstreamService" "" .mock }}
@@ -63,7 +69,8 @@ data:
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_pass {{ $scheme }}://{{ $serviceName }}:{{ $servicePort }}{{ $normalizedMockBasePath }}$1;
+          rewrite ^/mock/{{ $domainRegex }}/{{ $versionRegex }}/?(.*)$ {{ $normalizedMockBasePath }}$1 break;
+          proxy_pass {{ $scheme }}://{{ $serviceName }}:{{ $servicePort }};
         }
 {{ end }}
 {{ end }}
