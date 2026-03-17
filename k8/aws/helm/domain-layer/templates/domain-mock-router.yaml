@@ -34,6 +34,8 @@ spec:
       app: mock-router
   template:
     metadata:
+      annotations:
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/domain-mock-router-configmap.yaml") . | sha256sum }}
       labels:
         app: mock-router
         component: router

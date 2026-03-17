@@ -34,6 +34,8 @@ spec:
       app: api-router
   template:
     metadata:
+      annotations:
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/domain-api-router-configmap.yaml") . | sha256sum }}
       labels:
         app: api-router
         component: router
