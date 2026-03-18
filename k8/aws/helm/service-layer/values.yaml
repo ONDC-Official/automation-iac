@@ -232,7 +232,7 @@ uiBackend:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/automation-frontend/backend
-    tag: dev-1.0.4
+    tag: dev-1.0.5
   service:
     type: ClusterIP
     port: 5000
@@ -266,7 +266,7 @@ uiFrontend:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/automation-frontend/frontend
-    tag: dev-1.0.4
+    tag: dev-1.0.5
   service:
     type: ClusterIP
     port: 5001
