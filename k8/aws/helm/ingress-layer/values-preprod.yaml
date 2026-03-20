@@ -16,6 +16,7 @@ ingress:
     alb.ingress.kubernetes.io/transforms.backoffice-backend:
     alb.ingress.kubernetes.io/transforms.db-service:
     alb.ingress.kubernetes.io/transforms.config-service:
+    alb.ingress.kubernetes.io/transforms.report-service:
   hosts:
     - host: automation-preprod.ondc.org
       paths:
@@ -39,6 +40,10 @@ ingress:
           pathType: Prefix
           service: backoffice-backend
           port: 5000
+        - path: /report
+          pathType: Prefix
+          service: report-service
+          port: 3000
 
 domainRouting:
   enabled: true

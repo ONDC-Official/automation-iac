@@ -19,6 +19,7 @@ ingress:
     alb.ingress.kubernetes.io/transforms.backoffice-backend: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/backoffice-api\\/?(.*)$","replace":"/$1"}]}}]'
     alb.ingress.kubernetes.io/transforms.db-service: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/db-service\\/?(.*)$","replace":"/$1"}]}}]'
     alb.ingress.kubernetes.io/transforms.config-service: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/config-service\\/?(.*)$","replace":"/$1"}]}}]'
+    alb.ingress.kubernetes.io/transforms.report-service: '[{"type":"url-rewrite","urlRewriteConfig":{"rewrites":[{"regex":"^\\/report\\/?(.*)$","replace":"/$1"}]}}]'
   hosts:
     - host: dev-workbench.ondc.tech
       paths:
@@ -50,6 +51,10 @@ ingress:
           pathType: Prefix
           service: config-service
           port: 5556
+        - path: /report
+          pathType: Prefix
+          service: report-service
+          port: 3000
 
 domainRouting:
   enabled: true

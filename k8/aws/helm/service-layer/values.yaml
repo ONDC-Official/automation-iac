@@ -35,7 +35,8 @@ commonEnv:
   apiServiceIngressUrl: "http://dev-workbench.ondc.tech/api-service"
   apiServiceKey: "D33A76D111B4BDFCB96A2AC34B85E"
   configServiceUrl: "http://config-service:5556"
-  reportingServiceUrl: "http://report-service:3000/"
+  # reportingServiceUrl: "http://report-service:3000/"
+  reportingServiceUrl: http://dev-workbench.ondc.tech/report
   validationUrl: "https://log-validation.ondc.org/api/validate"
   playgroundMockServiceUrl: "http://dev-workbench.ondc.tech/mock"
   uiBackendUrl: "http://dev-workbench.ondc.tech/backend-ui"
