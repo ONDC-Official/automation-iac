@@ -1,0 +1,83 @@
+{{- range .Values.domains }}
+{{- if and (default true .enabled) .domain .version .mock (default true .mock.enabled) }}
+{{- $mode := include "automation-domain-layer.mockMode" .mock.mode }}
+{{- if ne $mode "playground" }}
+{{- $key := include "automation-domain-layer.domainKey" (dict "domain" .domain "version" .version) }}
+{{- $name := default (printf "domain-%s-mock" $key) .mock.serviceName }}
+{{- $serviceType := default "ClusterIP" (dig "service" "type" "" .mock) }}
+{{- $port := default 3031 (dig "service" "port" nil .mock) }}
+{{- $resources := default $.Values.global.resources .mock.resources }}
+{{- $replicas := default (default $.Values.global.replicas .replicas) .mock.replicas }}
+{{- $commonEnv := default dict $.Values.commonEnv.mock }}
+{{- $mockEnv := default dict .mock.env }}
+{{- $fixedEnv := dict "DOMAIN" .domain "VERSION" .version "DOMAIN_VERSION" .version }}
+{{- $mergedEnv := mergeOverwrite (dict) $commonEnv $mockEnv $fixedEnv }}
+{{- $domainLabel := include "automation-domain-layer.labelValue" .domain }}
+{{- $versionLabel := include "automation-domain-layer.labelValue" .version }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.global.namespace | default $.Release.Namespace }}
+  labels:
+    app: {{ $name }}
+    component: mock
+    domain: {{ $domainLabel | quote }}
+    domainVersion: {{ $versionLabel | quote }}
+    {{- include "automation-domain-layer.labels" $ | nindent 4 }}
+spec:
+  type: {{ $serviceType }}
+  selector:
+    app: {{ $name }}
+  ports:
+    - name: http
+      port: {{ $port }}
+      targetPort: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.global.namespace | default $.Release.Namespace }}
+  labels:
+    app: {{ $name }}
+    component: mock
+    domain: {{ $domainLabel | quote }}
+    domainVersion: {{ $versionLabel | quote }}
+    {{- include "automation-domain-layer.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ $replicas }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+        component: mock
+        domain: {{ $domainLabel | quote }}
+        domainVersion: {{ $versionLabel | quote }}
+    spec:
+      containers:
+        - name: mock
+          image: {{ required (printf "domains[%s].mock.image.repository is required" $key) .mock.image.repository }}:{{ required (printf "domains[%s].mock.image.tag is required" $key) .mock.image.tag }}
+          imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
+          {{- with .mock.command }}
+          command:
+{{ toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ $port }}
+          env:
+            {{- range $envName, $envValue := $mergedEnv }}
+            - name: {{ $envName }}
+              value: {{ tpl (toString $envValue) $ | quote }}
+            {{- end }}
+          resources:
+{{ toYaml $resources | nindent 12 }}
+{{- end }}
+{{- end }}
+{{- end }}

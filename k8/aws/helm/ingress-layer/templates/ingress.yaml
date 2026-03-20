@@ -41,5 +41,21 @@ spec:
             port:
               number: {{ .port }}
       {{- end }}
+      {{- if $.Values.domainRouting.enabled }}
+      - path: {{ $.Values.domainRouting.api.path }}
+        pathType: {{ $.Values.domainRouting.api.pathType }}
+        backend:
+          service:
+            name: {{ $.Values.domainRouting.api.service }}
+            port:
+              number: {{ $.Values.domainRouting.api.port }}
+      - path: {{ $.Values.domainRouting.mock.path }}
+        pathType: {{ $.Values.domainRouting.mock.pathType }}
+        backend:
+          service:
+            name: {{ $.Values.domainRouting.mock.service }}
+            port:
+              number: {{ $.Values.domainRouting.mock.port }}
+      {{- end }}
   {{- end }}
 {{- end }}

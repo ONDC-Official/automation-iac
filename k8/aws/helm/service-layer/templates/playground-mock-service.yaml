@@ -1,0 +1,3 @@
+{{- if .Values.playgroundMockService.enabled }}
+{{ include "automation-service-layer.renderService" (dict "root" $ "service" .Values.playgroundMockService "name" "playground-mock-service" "component" "backend") }}
+{{- end }}

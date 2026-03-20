@@ -6,6 +6,9 @@ This chart contains only ALB ingress routing for automation services.
 
 - Creates a single `Ingress` for automation routes.
 - Joins the existing gcr ALB via `alb.ingress.kubernetes.io/group.name`.
+- Supports stable domain routing entry points:
+  - `/api-service/*` -> `api-router`
+  - `/mock/*` -> `mock-router`
 - Does not manage Deployments or Services.
 
 ## Deploy
@@ -27,3 +30,5 @@ helm upgrade --install automation-ingress ./automation-infra/ingress-layer \
 
 - Keep ALB-wide annotations in gcr ingress.
 - Keep route-only annotations in this chart (`group.name`, `group.order`, host/path rules).
+- Domain-router paths are controlled by `domainRouting` values.
+- Router services are deployed by `automation-infra/domain-layer`.

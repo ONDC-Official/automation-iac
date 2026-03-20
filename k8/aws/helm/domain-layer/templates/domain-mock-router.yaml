@@ -1,0 +1,72 @@
+{{- if .Values.mockRouter.enabled }}
+{{- $resources := default .Values.global.resources .Values.mockRouter.resources }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-router
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: mock-router
+    {{- include "automation-domain-layer.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.mockRouter.service.type }}
+  selector:
+    app: mock-router
+  ports:
+    - name: http
+      port: {{ .Values.mockRouter.service.port }}
+      targetPort: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-router
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: mock-router
+    {{- include "automation-domain-layer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mockRouter.replicas | default .Values.global.replicas }}
+  selector:
+    matchLabels:
+      app: mock-router
+  template:
+    metadata:
+      annotations:
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/domain-mock-router-configmap.yaml") . | sha256sum }}
+      labels:
+        app: mock-router
+        component: router
+    spec:
+      containers:
+        - name: mock-router
+          image: {{ .Values.mockRouter.image.repository }}:{{ .Values.mockRouter.image.tag }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.mockRouter.service.port }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+{{ toYaml $resources | nindent 12 }}
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: mock-router-nginx-config
+{{- end }}

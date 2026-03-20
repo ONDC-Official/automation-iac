@@ -1,0 +1,15 @@
+apiVersion: v2
+name: automation-domain-layer
+description: Domain API/mock services and routing layer for automation framework
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - automation
+  - domain-layer
+  - api
+  - mock
+  - router
+maintainers:
+  - name: Platform Team
+    email: platform@example.com
