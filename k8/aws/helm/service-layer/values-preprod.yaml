@@ -8,3 +8,25 @@ commonEnv:
   otelUrl: "http://otel-collector.gcr-preprod.svc.cluster.local:4318"
   lokiHost: "http://loki.gcr-preprod.svc.cluster.local:3100"
   lokiPushUrl: "http://loki.gcr-preprod.svc.cluster.local:3100/loki/api/v1/push"
+
+reportPramaanBuyer:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/automation-report-pramaan-buyer
+    tag: dev-0.0.5
+  service:
+    type: ClusterIP
+    port: 3005
+  env:
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+
+reportPramaanSeller:
+  enabled: true
+  image:
+    repository: ghcr.io/ondc-official/automation-report-pramaan-seller
+    tag: dev-0.0.5
+  service:
+    type: ClusterIP
+    port: 3005
+  env:
+    NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
