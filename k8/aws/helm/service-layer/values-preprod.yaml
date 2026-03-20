@@ -13,7 +13,7 @@ reportPramaanBuyer:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/automation-report-pramaan-buyer
-    tag: dev-0.0.5
+    tag: prod-0.0.5
   service:
     type: ClusterIP
     port: 3005
@@ -24,7 +24,7 @@ reportPramaanSeller:
   enabled: true
   image:
     repository: ghcr.io/ondc-official/automation-report-pramaan-seller
-    tag: dev-0.0.5
+    tag: prod-0.0.5
   service:
     type: ClusterIP
     port: 3005
