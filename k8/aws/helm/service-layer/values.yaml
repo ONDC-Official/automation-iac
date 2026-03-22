@@ -14,7 +14,7 @@ global:
 
 commonEnv:
   nodeEnv: dev
-  otelUrl: "http://otel-collector.gcr-dev.svc.cluster.local:4318"
+  otelUrl: "http://jaeger:4318/v1/traces"
   lokiHost: "http://loki.gcr-dev.svc.cluster.local:3100"
   lokiPushUrl: "http://loki.gcr-dev.svc.cluster.local:3100/loki/api/v1/push"
   redisHost: "redis"
@@ -36,7 +36,7 @@ commonEnv:
   apiServiceKey: "D33A76D111B4BDFCB96A2AC34B85E"
   configServiceUrl: "http://config-service:5556"
   # reportingServiceUrl: "http://report-service:3000/"
-  reportingServiceUrl: http://dev-workbench.ondc.tech/report
+  reportingServiceUrl: http://dev-workbench.ondc.tech/
   validationUrl: "https://log-validation.ondc.org/api/validate"
   playgroundMockServiceUrl: "http://dev-workbench.ondc.tech/mock"
   uiBackendUrl: "http://dev-workbench.ondc.tech/backend-ui"
@@ -47,7 +47,25 @@ commonEnv:
   backofficeBasePath: "/backoffice"
   bapUrl: "http://dev-workbench.ondc.tech/buyer"
   bppUrl: "http://dev-workbench.ondc.tech/seller"
-  pramaanUrl: "http://report-pramaan-buyer:3005"
+  pramaanUrl: "http://report-pramaan-buyer:3005/runtest"
+  pramaanAnalyticsApi: "https://pramaan.ondc.org/beta/analytics-api"
+  pwLogsApi: "http://dev-workbench.ondc.tech/report"
+  pramaanBuyerTestingUrl: "http://report-pramaan-buyer:3005"
+  pramaanSellerTestingUrl: "http://report-pramaan-seller:3005"
+  pramaanFlushPeriod: "P90D"
+
+jaeger:
+  enabled: true
+  image:
+    repository: jaegertracing/all-in-one
+    tag: "1.57.0"
+  service:
+    type: ClusterIP
+    uiPort: 16686
+    otlpGrpcPort: 4317
+    otlpHttpPort: 4318
+  env:
+    COLLECTOR_OTLP_ENABLED: "true"
 
 backofficeBackend:
   enabled: true
@@ -172,7 +190,16 @@ reportPramaanBuyer:
     type: ClusterIP
     port: 3005
   env:
+    BUYER_TESTING_URI: '{{ .Values.commonEnv.pramaanBuyerTestingUrl }}'
+    FLUSHPERIOD: '{{ .Values.commonEnv.pramaanFlushPeriod }}'
+    HOST: '0.0.0.0'
+    MONGODB_URI: '{{ printf "mongodb://%s:%s/buyer-db" .Values.commonEnv.databaseHost .Values.commonEnv.databasePort }}'
     NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+    PORT: '{{ .Values.reportPramaanBuyer.service.port }}'
+    PW_LOGS_API: '{{ .Values.commonEnv.pwLogsApi }}'
+    PW_LOGS_API_KEY: '{{ .Values.commonEnv.apiServiceKey }}'
+    SELLER_TESTING_URI: '{{ .Values.commonEnv.pramaanSellerTestingUrl }}'
+    analyticsAPI: '{{ .Values.commonEnv.pramaanAnalyticsApi }}'
 
 reportPramaanSeller:
   enabled: true
@@ -183,7 +210,17 @@ reportPramaanSeller:
     type: ClusterIP
     port: 3005
   env:
+    BUYER_TESTING_URI: '{{ .Values.commonEnv.pramaanBuyerTestingUrl }}'
+    FLUSHPERIOD: '{{ .Values.commonEnv.pramaanFlushPeriod }}'
+    HOST: '0.0.0.0'
+    MONGODB_URI: '{{ printf "mongodb://%s:%s/seller-db" .Values.commonEnv.databaseHost .Values.commonEnv.databasePort }}'
     NODE_ENV: '{{ .Values.commonEnv.nodeEnv }}'
+    PORT: '{{ .Values.reportPramaanSeller.service.port }}'
+    PW_LOGS_API: '{{ .Values.commonEnv.pwLogsApi }}'
+    PW_LOGS_API_KEY: '{{ .Values.commonEnv.apiServiceKey }}'
+    SELLER_DB_URI: '{{ printf "mongodb://%s:%s/seller-db" .Values.commonEnv.databaseHost .Values.commonEnv.databasePort }}'
+    SELLER_TESTING_URI: '{{ .Values.commonEnv.pramaanSellerTestingUrl }}'
+    analyticsAPI: '{{ .Values.commonEnv.pramaanAnalyticsApi }}'
 
 recorderService:
   enabled: true

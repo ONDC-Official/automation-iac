@@ -39,7 +39,7 @@ commonEnv:
     SIGN_PRIVATE_KEY: "gE7tpilZkyzJeajBuwX8X7PW5oo5ljZMp6EclhMT1GFC5JNDYtYItptTe91lvH7ygMYiDB/s35bw51kHXuEm1Q=="
     SIGN_PUBLIC_KEY: "QuSTQ2LWCLabU3vdZbx+8oDGIgwf7N+W8OdZB17hJtU="
     SUBSCRIBER_ID: "dev-workbench.ondc.tech"
-    TRACE_URL: "http://172.17.0.1:4318/v1/traces"
+    TRACE_URL: "http://jaeger:4318/v1/traces"
     UKID: "143d22e7-4236-4419-bb24-b4d3aad6d8fb"
     UNIQUE_KEY_ID: "143d22e7-4236-4419-bb24-b4d3aad6d8fb"
     WORKBENCH_SUBSCRIBER_ID: "dev-workbench.ondc.tech"

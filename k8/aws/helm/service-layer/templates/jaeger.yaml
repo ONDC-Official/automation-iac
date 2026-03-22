@@ -1,0 +1,64 @@
+{{- if and .Values.jaeger.enabled (eq (.Values.global.environment | default "dev") "dev") }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: jaeger
+    {{- include "automation-service-layer.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.jaeger.service.type }}
+  selector:
+    app: jaeger
+  ports:
+    - name: ui
+      port: {{ .Values.jaeger.service.uiPort }}
+      targetPort: ui
+    - name: otlp-grpc
+      port: {{ .Values.jaeger.service.otlpGrpcPort }}
+      targetPort: otlp-grpc
+    - name: otlp-http
+      port: {{ .Values.jaeger.service.otlpHttpPort }}
+      targetPort: otlp-http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+  labels:
+    app: jaeger
+    {{- include "automation-service-layer.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+        component: observability
+    spec:
+      containers:
+        - name: jaeger
+          image: {{ .Values.jaeger.image.repository }}:{{ .Values.jaeger.image.tag }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          env:
+            {{- range $envName, $envValue := .Values.jaeger.env }}
+            - name: {{ $envName }}
+              value: {{ $envValue | quote }}
+            {{- end }}
+          ports:
+            - name: ui
+              containerPort: {{ .Values.jaeger.service.uiPort }}
+            - name: otlp-grpc
+              containerPort: {{ .Values.jaeger.service.otlpGrpcPort }}
+            - name: otlp-http
+              containerPort: {{ .Values.jaeger.service.otlpHttpPort }}
+          resources:
+{{ toYaml .Values.global.resources | nindent 12 }}
+{{- end }}
