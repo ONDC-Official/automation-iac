@@ -117,8 +117,8 @@ domains:
     api:
       enabled: true
       image:
-        repository: ghcr.io/ondc-official/ondc-onix-dev-api-service-ret11-1.2.0
-        tag: k8-1.8
+        repository: ghcr.io/ondc-official/ondc-onix-dev-automation-onix-service-ondcret11-1.2.0
+        tag: dev-5bdd1
       service:
         type: ClusterIP
         port: 7039
